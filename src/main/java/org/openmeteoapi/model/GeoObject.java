@@ -1,12 +1,16 @@
 package org.openmeteoapi.model;
 
-public class City {
+public class GeoObject {
 
    private String name;
-   private double lat;
+    private double lat;
    private double lon;
 
-    public City(String name, double lat, double lon) {
+    public GeoObject(String name) {
+        this.name = name;
+    }
+
+    public GeoObject(String name, double lat, double lon) {
         this.name = name;
         this.lat = lat;
         this.lon = lon;

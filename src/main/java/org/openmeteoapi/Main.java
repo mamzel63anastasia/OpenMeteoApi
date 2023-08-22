@@ -1,6 +1,6 @@
 package org.openmeteoapi;
 
-import org.openmeteoapi.model.City;
+import org.openmeteoapi.model.GeoObject;
 import org.openmeteoapi.model.Weather;
 
 import java.io.IOException;
@@ -13,8 +13,10 @@ public class Main {
 //        System.out.println(response.getStatus());
 
         ApiWeather apiWeather = new ApiWeather("30f1d5e8-b51f-42a5-a9e9-a6c206cd5efc");
-        List<City> cityList = apiWeather.searchCity("Москва");
-        Weather weather = apiWeather.currentWeather(cityList.get(0));
+        List<GeoObject> geoObjectList = apiWeather.searchGeoObject("Москва");
+        Weather weather = apiWeather.currentWeather(geoObjectList.get(0));
         System.out.println(weather.getTemperature());
+
+
     }
 }

@@ -8,8 +8,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
 
 public class HttpClient {
     private final String apiKey;
@@ -27,10 +26,6 @@ public class HttpClient {
             HttpURLConnection con = (HttpURLConnection) uri.toURL().openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("X-Yandex-API-Key", apiKey);
-            con.setRequestProperty("Connection", "Keep-Alive");
-            con.setRequestProperty("User-Agent", "Apache-HttpClient/4.5.14 (Java/17.0.7)");
-            con.setRequestProperty("Accept-Encoding", "br,deflate,gzip,x-gzip");
-            con.setRequestProperty("Content-Type", "text/html; charset=UTF-8");
             response.setStatus(con.getResponseCode());
 
             if (con.getResponseCode() == 200) {
@@ -44,16 +39,18 @@ public class HttpClient {
     }
 
     private String buildResponse(HttpURLConnection con) {
-        try (final BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+        try (final BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(con.getInputStream())))) {
             String inputLine;
             final StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 content.append(inputLine);
             }
+
             return content.toString();
         } catch (final Exception ex) {
             ex.printStackTrace();
-            return "";
         }
+
+        return "";
     }
 }

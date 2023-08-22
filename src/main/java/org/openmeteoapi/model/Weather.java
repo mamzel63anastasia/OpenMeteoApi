@@ -1,30 +1,30 @@
 package org.openmeteoapi.model;
 
 public class Weather {
-    private String temp;
-    private City city;
+    private int temp;
+    private GeoObject geoObject;
 
-    public Weather(String temp, City city) {
+    public Weather(int temp, GeoObject geoObject) {
         this.temp = temp;
-        this.city = city;
+        this.geoObject = geoObject;
     }
 
     public Weather() {
     }
 
-    public String getTemperature() {
+    public int getTemperature() {
         return temp;
     }
 
-    public void setTemperature(String temp) {
+    public void setTemperature(int temp) {
         this.temp = temp;
     }
 
-    public City getCity() {
-        return city;
+    public GeoObject getCity() {
+        return geoObject;
     }
 
-    public void setCity(City city) {
-        this.city = city;
+    public void setCity(GeoObject geoObject) {
+        this.geoObject = geoObject;
     }
 }
