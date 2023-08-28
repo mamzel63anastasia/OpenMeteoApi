@@ -8,7 +8,9 @@ import org.openmeteoapi.model.HttpClientResponse;
 import org.openmeteoapi.model.Weather;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ApiWeather {
     private final String apiKey;
@@ -17,23 +19,25 @@ public class ApiWeather {
         this.apiKey = apiKey;
     }
 
-    public List<GeoObject> searchGeoObject(String name, int len) {
+    public List<GeoObject> searchGeoObject(GeoObject geoObject) {
         List<GeoObject> list = new ArrayList<>();
-        list.add(new GeoObject("Москва", 55.75396, 37.620393));
+        list.add(new GeoObject(geoObject.getName(), geoObject.getLat(), geoObject.getLon()));
         return list;
     }
 
-    public List<GeoObject> searchGeoObject(String name) {
-        return searchGeoObject(name, 10);
-    }
+
 
     public Weather currentWeather(GeoObject geoObject) {
-        HttpClient httpClient = new HttpClient(apiKey);
-        HttpClientResponse response = httpClient.get("https://api.weather.yandex.ru/v2/forecast?" + geoObject + "&extra=true");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-Yandex-API-Key", apiKey);
+        HttpClient httpClient = new HttpClient();
+        HttpClientResponse response =
+                httpClient.get("https://api.weather.yandex.ru/v2/forecast?" + geoObject + "&extra=true", headers);
         try {
             String json = response.getResponse();
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(json);
             JSONObject fact = (JSONObject) jsonObject.get("fact");
+
 
             return new Weather(Integer.parseInt(fact.get("temp").toString()), geoObject);
         } catch (ParseException e) {

@@ -8,24 +8,27 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 public class HttpClient {
-    private final String apiKey;
-
-    public HttpClient(String apiKey) {
-        this.apiKey = apiKey;
-    }
 
 
-    public HttpClientResponse get(String urlStr) {
+    public HttpClientResponse get(String urlStr, Map<String, String> headers) {
         HttpClientResponse response = new HttpClientResponse();
         try {
             URI uri = new URI(urlStr);
 
             HttpURLConnection con = (HttpURLConnection) uri.toURL().openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("X-Yandex-API-Key", apiKey);
+
+            for (Map.Entry<String, String> header : headers.entrySet()){
+                con.setRequestProperty(header.getKey(), header.getValue());
+            }
+
+            con.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+
             response.setStatus(con.getResponseCode());
 
             if (con.getResponseCode() == 200) {
@@ -36,6 +39,10 @@ public class HttpClient {
         }
 
         return response;
+    }
+
+    public HttpClientResponse get(String urlStr){
+        return get(urlStr, new HashMap<>());
     }
 
     private String buildResponse(HttpURLConnection con) {
