@@ -1,11 +1,16 @@
 package org.openmeteoapi;
 
-import org.openmeteoapi.model.City;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+import org.openmeteoapi.model.GeoObject;
 import org.openmeteoapi.model.HttpClientResponse;
 import org.openmeteoapi.model.Weather;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ApiWeather {
     private final String apiKey;
@@ -14,24 +19,31 @@ public class ApiWeather {
         this.apiKey = apiKey;
     }
 
-    public List<City> searchCity (String name, int len){
-        List<City> list = new ArrayList<>();
-        list.add(new City("Москва", 55.75396, 37.620393));
+    public List<GeoObject> searchGeoObject(GeoObject geoObject) {
+        List<GeoObject> list = new ArrayList<>();
+        list.add(new GeoObject(geoObject.getName(), geoObject.getLat(), geoObject.getLon()));
         return list;
     }
 
-    public List<City> searchCity(String name) {
-        return searchCity(name, 10);
+
+
+    public Weather currentWeather(GeoObject geoObject) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-Yandex-API-Key", apiKey);
+        HttpClient httpClient = new HttpClient();
+        HttpClientResponse response =
+                httpClient.get("https://api.weather.yandex.ru/v2/forecast?" + geoObject + "&extra=true", headers);
+        try {
+            String json = response.getResponse();
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(json);
+            JSONObject fact = (JSONObject) jsonObject.get("fact");
+
+
+            return new Weather(Integer.parseInt(fact.get("temp").toString()), geoObject);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Weather currentWeather(City city) {
-        HttpClient httpClient =  new HttpClient(apiKey);
-        HttpClientResponse response = httpClient.get("https://api.weather.yandex.ru/v2/forecast?" + city + "&extra=true");
 
-        System.out.println(response.getResponse());
-
-
-        Weather weather = new Weather();
-        return new  Weather(weather.getTemperature(), weather.getCity());
-    }
 }
